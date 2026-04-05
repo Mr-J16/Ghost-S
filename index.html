@@ -5,223 +5,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shhhhh Es Un Secreto</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #050505;
+            --text-main: #d1d5db;
+            --border-color: #333333;
+            --accent-muted: #1f2937;
+        }
+
         body {
-            /* Fondo con patrón de cuadrícula para un look de ciencia ficción más misterioso */
-            background-color: #040710; /* Azul muy oscuro */
-            background-image: radial-gradient(#101625 1px, transparent 1px); /* Cuadrícula azul oscuro */
-            background-size: 20px 20px;
-            font-family: 'Roboto Mono', monospace;
-            color: #A1B2C8; /* Tono de gris azulado para texto general, más sutil */
+            background-color: var(--bg-color);
+            font-family: 'Courier Prime', monospace;
+            color: var(--text-main);
+            overflow-x: hidden;
         }
+
+        /* Efecto de ruido estático analógico */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Líneas de escaneo CRT */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 50;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
         .container-panel {
-            background-color: rgba(10, 15, 25, 0.95); /* Azul oscuro casi negro con ligera transparencia */
-            border: 2px solid #2B3A4F; /* Borde mate en lugar de neón */
-            box-shadow: 0 0 10px rgba(0,0,0,0.3), inset 0 0 5px rgba(0,0,0,0.1); /* Sombra suave y sutil */
-            backdrop-filter: blur(7px);
-            border-radius: 15px;
+            background-color: #0a0a0a;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 10;
         }
-        .text-subtle {
-            color: #A1B2C8; /* Gris azulado para un look más mate */
-            text-shadow: none; /* Elimina el brillo neón */
+
+        .title-noir {
             font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            animation: flicker 4s infinite alternate;
         }
-        .input-glow:focus {
-            box-shadow: 0 0 5px rgba(43, 58, 79, 0.5), inset 0 0 3px rgba(43, 58, 79, 0.3); /* Sombra de enfoque sutil */
-            border-color: #2B3A4F;
+
+        @keyframes flicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
         }
-        .btn-send {
-            background-color: #2C3A4F; /* Azul oscuro mate para el botón */
-            transition: all 0.3s ease;
-            box-shadow: none; /* Elimina la sombra neón */
-            border: 1px solid #5E6A7A; /* Borde sutil */
+
+        .input-noir {
+            background-color: #000000;
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            transition: border-color 0.3s;
         }
-        .btn-send:hover {
-            background-color: #3A4E67; /* Tono ligeramente más claro al pasar el ratón */
-            transform: translateY(-2px) scale(1.01); /* Efecto de "levantamiento" sutil */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Sombra al pasar el ratón para dar profundidad */
+
+        .input-noir:focus {
+            outline: none;
+            border-color: #6b7280;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
         }
-        .btn-send:active {
-            transform: translateY(1px) scale(1); /* Efecto de "presión" al hacer clic */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+
+        .btn-noir {
+            background-color: #111111;
+            border: 1px solid #444;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
         }
+
+        .btn-noir:hover {
+            background-color: #222;
+            border-color: #666;
+        }
+
         .message-bubble {
-            background-color: rgba(18, 28, 45, 0.9); /* Azul oscuro para burbujas de mensaje */
-            border-left: 3px solid #5E6A7A; /* Borde sutil en lugar de neón */
-            animation: slideInLeft 0.5s ease-out;
-            border-radius: 8px;
+            background-color: #111;
+            border-left: 2px solid #555;
+            animation: slideIn 0.3s ease-out;
         }
-        .toast {
-            animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
-            background-color: #2C3A4F; /* Color de fondo del toast mate */
-            color: #A1B2C8; /* Texto claro en el toast */
-            box-shadow: 0 0 10px rgba(0,0,0,0.4);
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        @keyframes slideInLeft {
-            from { transform: translateX(-30px); opacity: 0; }
+
+        @keyframes slideIn {
+            from { transform: translateX(-10px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        .relative-input-container {
-            position: relative;
-        }
-        .clear-recipient-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #A1B2C8; /* Color de texto general */
-            font-size: 1.3rem;
-            line-height: 1;
-            transition: color 0.3s ease;
-        }
-        .clear-recipient-btn:hover {
-            color: #5E6A7A; /* Color mate al pasar el ratón */
-        }
+
         .fading-out {
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
             opacity: 0;
-            transform: scale(0.95); /* Se encoge un poco al desaparecer */
+            transform: scale(0.98);
+            transition: all 0.5s ease-out;
         }
-        #status-message {
-            background-color: #5E6A7A; /* Gris oscuro para el estado de conexión */
-            color: #1A222E; /* Texto oscuro */
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        }
-        #status-message.hidden {
-            display: none;
-        }
-        .bg-gray-900\/50 {
-            background-color: rgba(18, 28, 45, 0.7);
-            border: 1px solid #2B3A4F; /* Borde sutil */
-        }
-        .placeholder-gray-500::placeholder {
-            color: #5E6A7A; /* Color de placeholder mate */
-        }
-        .internal-panel {
-            background-color: #1A222E; /* Gris oscuro mate para los paneles internos */
-            border: 1px solid #2C3A4F; /* Borde más sutil */
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-        }
-        #userId:hover {
-            color: #5E6A7A; /* Sutil cambio de color en lugar de neón */
-            background-color: rgba(44, 58, 79, 0.2);
-        }
-        /* Estilos para el indicador de presencia */
+
+        /* Indicador de presencia sobrio */
         .presence-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block;
         }
-        .online-dot { background-color: #34D399; /* verde */ }
-        .offline-dot { background-color: #EF4444; /* rojo */ }
-        .checking-dot { background-color: #FBBF24; /* amarillo */ animation: pulse 1.5s infinite; }
-        .tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(10, 15, 25, 0.95);
-            color: #A1B2C8;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            z-index: 20;
-            margin-bottom: 5px;
-        }
-        .relative-input-container:hover .tooltip {
-            opacity: 1;
-            visibility: visible;
-        }
+        .online-dot { background-color: #9ca3af; box-shadow: 0 0 5px #9ca3af; }
+        .offline-dot { background-color: #374151; }
+        .checking-dot { background-color: #6b7280; animation: pulse 1s infinite; }
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Pantalla de privacidad */
+        #privacy-shield {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #000; z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            color: #444; font-size: 2rem;
+            transition: opacity 0.3s; opacity: 0; pointer-events: none;
+        }
+        #privacy-shield.active {
+            opacity: 1; pointer-events: all;
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
 
-    <div class="w-full max-w-md mx-auto rounded-xl p-6 md:p-8 space-y-6 container-panel">
-        <div id="status-message" class="text-black p-3 rounded-lg text-center text-sm font-bold">
-            ⏳ Conectando con el Servidor...
+    <div id="privacy-shield">SISTEMA BLOQUEADO</div>
+
+    <div class="w-full max-w-md mx-auto rounded-none p-6 md:p-8 space-y-6 container-panel">
+        <div id="status-message" class="bg-gray-900 border border-gray-700 text-gray-400 p-2 text-center text-xs tracking-widest uppercase hidden">
+            Estableciendo conexión segura...
         </div>
         
-        <div class="text-center">
-            <h1 class="text-4xl font-bold text-subtle">GHOST PROJECT</h1>
-            <p class="text-gray-400 mt-2 text-sm">Mensajes diseñados para desvanecerse.</p>
+        <div class="text-center mt-2 border-b border-gray-800 pb-6">
+            <h1 class="text-3xl font-bold title-noir">GHOST PROJECT</h1>
+            <p class="text-gray-500 mt-2 text-xs uppercase tracking-widest">Protocolo de Cero Rastros</p>
         </div>
 
-        <div class="p-4 rounded-lg text-center internal-panel">
-            <p class="text-xs text-gray-500 mb-2">Tu Identificador de Enlace:</p>
-            <div id="loading-spinner" class="flex justify-center items-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-subtle"></div>
-            </div>
-            <p id="userId" class="font-mono text-xl text-subtle break-all select-all cursor-pointer hidden"></p>
+        <div class="p-4 bg-black border border-gray-800 text-center relative">
+            <p class="text-xs text-gray-600 mb-2 uppercase tracking-wide">Identificador Local:</p>
+            <div id="loading-spinner" class="animate-pulse text-gray-500 text-sm">Generando...</div>
+            <p id="userId" class="font-mono text-lg text-gray-300 break-all select-all cursor-pointer hidden hover:text-white transition-colors"></p>
         </div>
 
-        <form id="sendMessageForm" class="space-y-4">
-            <div class="relative-input-container">
-                <label for="recipientId" class="block text-sm font-medium text-gray-400 mb-2">
-                    Código del Receptor
-                </label>
-                <div class="relative">
-                    <span id="presence-indicator-container" class="absolute top-1/2 left-3 transform -translate-y-1/2 hidden">
-                        <span id="presence-indicator" class="presence-indicator checking-dot" data-tooltip="Verificando..."></span>
-                        <span id="presence-tooltip" class="tooltip">Verificando...</span>
+        <form id="sendMessageForm" class="space-y-5">
+            <div class="relative">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Enlace Objetivo</label>
+                <div class="relative flex items-center">
+                    <span id="presence-indicator-container" class="absolute left-3 hidden">
+                        <span id="presence-indicator" class="presence-indicator checking-dot"></span>
                     </span>
-                    <input type="text" id="recipientId" required placeholder="Ingresa el código del receptor..."
-                        class="w-full bg-gray-800 rounded-md px-3 pr-8 py-2 text-white placeholder-gray-500 border border-gray-700 input-glow">
+                    <input type="text" id="recipientId" required placeholder="ID del receptor..."
+                        class="w-full input-noir px-3 pl-8 py-3 text-sm placeholder-gray-700">
                 </div>
-                <button type="button" id="clearRecipientBtn" class="clear-recipient-btn" aria-label="Limpiar código del receptor">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-                </button>
             </div>
+            
             <div>
-                <label for="messageText" class="block text-sm font-medium text-gray-400 mb-2">Mensaje encriptado</label>
-                <textarea id="messageText" required rows="4" placeholder="Escribe tu mensaje... no dejes rastro."
-                            class="w-full bg-gray-800 rounded-md px-3 py-2 text-white placeholder-gray-500 border border-gray-700 input-glow"></textarea>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Carga Útil</label>
+                <textarea id="messageText" required rows="3" placeholder="Mensaje..."
+                            class="w-full input-noir px-3 py-3 text-sm placeholder-gray-700 resize-none"></textarea>
             </div>
-            <button type="submit"
-                    class="w-full btn-send text-white font-bold py-3 px-4 rounded-lg shadow-xl hover:scale-105">
-                Transmitir Mensaje
+            
+            <button type="submit" class="w-full btn-noir font-bold py-3 px-4 text-xs">
+                Transmitir
             </button>
         </form>
 
-        <div>
-            <h2 class="text-xl font-semibold mb-4 border-b-2 border-gray-700 pb-2 text-subtle">Buzón Fantasma</h2>
-            <div id="messagesContainer" class="space-y-4 h-48 overflow-y-auto p-2 rounded-lg internal-panel">
-                <p id="no-messages" class="text-gray-600 text-center py-4">Esperando transmisiones...</p>
+        <div class="pt-2">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 border-b border-gray-800 pb-2">Terminal de Recepción</h2>
+            <div id="messagesContainer" class="space-y-3 h-40 overflow-y-auto pr-2 scrollbar-hide">
+                <p id="no-messages" class="text-gray-700 text-xs text-center py-4 uppercase">Silencio en la red.</p>
             </div>
         </div>
     </div>
     
-    <div id="toast-notification" class="toast fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg hidden">
-        <p>¡Mensaje transmitido!</p>
+    <div id="toast-notification" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-900 border border-gray-700 text-gray-300 text-xs uppercase tracking-widest py-2 px-6 shadow-2xl hidden">
+        <p></p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // Nuevo: Importa Realtime Database
         import { getDatabase, ref, set, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-        // ✅ Tu configuración real
         const firebaseConfig = {
             apiKey: "AIzaSyAqsD-wMWesTqfvh0TK_5a5IZw0JJldS34",
             authDomain: "mensajes-297b5.firebaseapp.com",
@@ -232,268 +208,164 @@
             measurementId: "G-J8Z4SX2KHB"
         };
 
-        // Variables globales
-        const appId = "mensajes-297b5";
-        let app, auth, db, rtdb, currentUserId; // Nuevo: rtdb
-        const userIdElement = document.getElementById('userId');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const sendMessageForm = document.getElementById('sendMessageForm');
-        const recipientIdInput = document.getElementById('recipientId');
-        const messageTextInput = document.getElementById('messageText');
-        const messagesContainer = document.getElementById('messagesContainer');
-        const noMessagesElement = document.getElementById('no-messages');
-        const toastNotification = document.getElementById('toast-notification');
-        const statusMessage = document.getElementById('status-message');
-        const clearRecipientBtn = document.getElementById('clearRecipientBtn');
+        // Clave de encriptación estática para la demo (Idealmente usar intercambio de llaves)
+        const ENCRYPTION_KEY = "PROTOCOL_GHOST_2026"; 
 
-        // Nuevas variables para el indicador de presencia
-        const presenceIndicator = document.getElementById('presence-indicator');
-        const presenceIndicatorContainer = document.getElementById('presence-indicator-container');
-        const presenceTooltip = document.getElementById('presence-tooltip');
+        const appId = "mensajes-297b5";
+        let app, auth, db, rtdb, currentUserId;
+        const DOM = {
+            userId: document.getElementById('userId'),
+            spinner: document.getElementById('loading-spinner'),
+            form: document.getElementById('sendMessageForm'),
+            recipient: document.getElementById('recipientId'),
+            text: document.getElementById('messageText'),
+            messages: document.getElementById('messagesContainer'),
+            noMsg: document.getElementById('no-messages'),
+            toast: document.getElementById('toast-notification'),
+            status: document.getElementById('status-message'),
+            presenceInd: document.getElementById('presence-indicator'),
+            presenceContainer: document.getElementById('presence-indicator-container'),
+            shield: document.getElementById('privacy-shield')
+        };
+
         let presenceListener = null;
         let debounceTimer = null;
-        const onlineThreshold = 120000; // 2 minutos en milisegundos
 
         async function initialize() {
             try {
+                DOM.status.classList.remove('hidden');
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                rtdb = getDatabase(app); // Nuevo: Inicializa Realtime Database
-
-                statusMessage.textContent = 'Conectando con el Servidor...';
+                rtdb = getDatabase(app);
 
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         currentUserId = user.uid;
-                        displayUserId();
+                        DOM.userId.textContent = currentUserId;
+                        DOM.spinner.classList.add('hidden');
+                        DOM.userId.classList.remove('hidden');
+                        
                         listenForMessages();
-                        setupUserPresence(); // Nuevo: Configura el sistema de presencia
-                        statusMessage.classList.add('hidden');
+                        setupPresence();
+                        DOM.status.classList.add('hidden');
                     } else {
                         await signInAnonymously(auth);
                     }
                 });
             } catch (error) {
-                console.error("Error al inicializar:", error);
-                userIdElement.textContent = "Error de enlace.";
-                userIdElement.classList.remove('hidden');
-                loadingSpinner.classList.add('hidden');
-                statusMessage.textContent = '❌ Fallo en la conexión. Revisa las reglas de seguridad.';
-                statusMessage.style.backgroundColor = 'rgba(220, 38, 38, 0.8)';
+                console.error("Fallo de sistema:", error);
+                DOM.status.textContent = 'Error crítico de conexión.';
             }
         }
 
-        // Nuevo: Funciones para el sistema de presencia
-        function setupUserPresence() {
-            const userStatusDatabaseRef = ref(rtdb, 'presence/' + currentUserId);
-
-            // Se desconecta cuando el usuario cierra la página
-            onDisconnect(userStatusDatabaseRef).set(null);
-
-            // Actualiza la última vez que el usuario estuvo activo cada 30 segundos
-            setInterval(() => {
-                set(userStatusDatabaseRef, {
-                    last_online: Date.now()
-                });
-            }, 30000);
+        function setupPresence() {
+            const userRef = ref(rtdb, 'presence/' + currentUserId);
+            onDisconnect(userRef).set(null);
+            setInterval(() => set(userRef, { last_online: Date.now() }), 30000);
         }
 
-        function checkRecipientStatus(recipientId) {
-            // Limpia el listener anterior si existe
-            if (presenceListener) {
-                presenceListener();
-            }
-
-            // Muestra el indicador y el estado de "Verificando"
-            presenceIndicatorContainer.classList.remove('hidden');
-            presenceIndicator.className = 'presence-indicator checking-dot';
-            presenceTooltip.textContent = 'Verificando...';
+        function checkRecipient(id) {
+            if (presenceListener) presenceListener();
+            DOM.presenceContainer.classList.remove('hidden');
+            DOM.presenceInd.className = 'presence-indicator checking-dot';
             
-            // Obtiene la referencia al estado del receptor
-            const recipientStatusRef = ref(rtdb, 'presence/' + recipientId);
-
-            // Agrega un listener de tiempo real
-            presenceListener = onValue(recipientStatusRef, (snapshot) => {
+            presenceListener = onValue(ref(rtdb, 'presence/' + id), (snapshot) => {
                 const data = snapshot.val();
-                if (data && data.last_online) {
-                    const lastOnlineTime = data.last_online;
-                    const isOnline = (Date.now() - lastOnlineTime) < onlineThreshold;
-                    if (isOnline) {
-                        presenceIndicator.className = 'presence-indicator online-dot';
-                        presenceTooltip.textContent = 'En línea';
-                    } else {
-                        presenceIndicator.className = 'presence-indicator offline-dot';
-                        presenceTooltip.textContent = 'Desconectado';
-                    }
-                } else {
-                    presenceIndicator.className = 'presence-indicator offline-dot';
-                    presenceTooltip.textContent = 'Usuario no encontrado o desconectado';
-                }
+                const isOnline = data && (Date.now() - data.last_online) < 120000;
+                DOM.presenceInd.className = `presence-indicator ${isOnline ? 'online-dot' : 'offline-dot'}`;
             });
         }
-        
-        // Nuevo: Función para limpiar el indicador de presencia
-        function clearPresenceIndicator() {
-            if (presenceListener) {
-                presenceListener();
-                presenceListener = null;
-            }
-            presenceIndicatorContainer.classList.add('hidden');
+
+        function showToast(msg) {
+            DOM.toast.querySelector('p').textContent = msg;
+            DOM.toast.classList.remove('hidden');
+            setTimeout(() => DOM.toast.classList.add('hidden'), 2000);
         }
 
-        function debounce(func, timeout = 500){
-            return (...args) => {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => { func.apply(this, args); }, timeout);
-            };
-        }
-
-        const debouncedCheckRecipientStatus = debounce(checkRecipientStatus, 1000);
-
-        function displayUserId() {
-            userIdElement.textContent = currentUserId;
-            loadingSpinner.classList.add('hidden');
-            userIdElement.classList.remove('hidden');
-            userIdElement.onclick = () => {
-                navigator.clipboard.writeText(currentUserId).then(() => {
-                    showToast('ID copiado al portapapeles.');
-                }).catch(err => {
-                    showToast('Error al copiar el ID.', true);
-                });
-            };
-        }
-        
-        function showToast(message, isError = false) {
-            const toastP = toastNotification.querySelector('p');
-            toastP.textContent = message;
-            if (isError) {
-                toastNotification.style.backgroundColor = '#B34F5C'; /* Color de error mate */
-                toastNotification.style.boxShadow = '0 0 10px rgba(179, 79, 92, 0.5)';
-                toastNotification.style.color = '#1A222E';
-            } else {
-                toastNotification.style.backgroundColor = '#5E6A7A'; /* Color de éxito mate */
-                toastNotification.style.boxShadow = '0 0 10px rgba(94, 106, 122, 0.5)';
-                toastNotification.style.color = '#1A222E';
-            }
-            toastNotification.classList.remove('hidden');
-            setTimeout(() => { toastNotification.classList.add('hidden'); }, 3000);
-        }
-
-        async function handleSendMessage(e) {
+        // --- Lógica de Encriptación y Transmisión ---
+        DOM.form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const recipientId = recipientIdInput.value.trim();
-            const text = messageTextInput.value.trim();
-            if (!recipientId || !text || !currentUserId) { showToast("Completa los campos.", true); return; }
-            if (recipientId === currentUserId) { showToast("No puedes comunicarte contigo mismo.", true); return; }
+            const recipientId = DOM.recipient.value.trim();
+            const text = DOM.text.value.trim();
+            if (!recipientId || !text) return;
+
+            // Encriptación AES antes de enviar a Firestore
+            const encryptedText = CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+
             try {
-                const docRef = await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
+                await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
                     senderId: currentUserId,
                     recipientId: recipientId,
-                    text: text,
+                    text: encryptedText, // Se guarda el texto cifrado
                     timestamp: new Date(),
                 });
-                showToast("¡Mensaje transmitido con éxito!");
-                messageTextInput.value = '';
+                showToast("Transmisión Segura Enviada");
+                DOM.text.value = '';
             } catch (error) {
-                console.error("Error en la transmisión:", error);
-                showToast("Fallo en la transmisión.", true);
+                showToast("Fallo de Transmisión");
             }
-        }
-        
-        function clearChatHistory() {
-            messagesContainer.innerHTML = '';
-            messagesContainer.appendChild(noMessagesElement);
-            noMessagesElement.style.display = 'block';
-        }
+        });
 
         function listenForMessages() {
-            if (!currentUserId) return;
-            const q = query(
-                collection(db, `artifacts/${appId}/public/data/messages`),
-                where("recipientId", "==", currentUserId)
-            );
+            const q = query(collection(db, `artifacts/${appId}/public/data/messages`), where("recipientId", "==", currentUserId));
             onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added") {
-                        const messageData = change.doc.data();
-                        displayMessage(messageData, change.doc.id);
-                    }
+                    if (change.type === "added") displayMessage(change.doc.data(), change.doc.id);
                 });
             });
-        }
-        
-        async function deleteMessage(docId) {
-            try {
-                await deleteDoc(doc(db, `artifacts/${appId}/public/data/messages`, docId));
-                console.log("Mensaje borrado de Firestore:", docId);
-            } catch (error) {
-                console.error("Error al borrar el mensaje:", error);
-            }
         }
 
         function displayMessage(data, docId) {
-            if (noMessagesElement) noMessagesElement.style.display = 'none';
+            DOM.noMsg.style.display = 'none';
+            
+            // Desencriptar el mensaje recibido
+            let decryptedText = "[Datos Corruptos]";
+            try {
+                const bytes = CryptoJS.AES.decrypt(data.text, ENCRYPTION_KEY);
+                decryptedText = bytes.toString(CryptoJS.enc.Utf8) || "[Error de Desencriptación]";
+            } catch(e) {}
 
-            const messageWrapper = document.createElement('div');
-            messageWrapper.className = 'message-bubble p-4 rounded-lg shadow-md';
-            const senderP = document.createElement('p');
-            senderP.className = 'text-xs text-subtle font-bold mb-2 truncate';
-            senderP.textContent = `De: ${data.senderId}`;
-            const textP = document.createElement('p');
-            textP.className = 'text-gray-300 text-sm';
-            textP.textContent = data.text;
-            messageWrapper.appendChild(senderP);
-            messageWrapper.appendChild(textP);
-            messagesContainer.appendChild(messageWrapper);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            const div = document.createElement('div');
+            div.className = 'message-bubble p-3 text-xs';
+            div.innerHTML = `<p class="text-gray-500 mb-1 border-b border-gray-800 pb-1 font-bold">SRC: ${data.senderId.slice(0,8)}...</p>
+                             <p class="text-gray-300">${decryptedText}</p>`;
+            
+            DOM.messages.appendChild(div);
+            DOM.messages.scrollTop = DOM.messages.scrollHeight;
 
-            const disappearTime = 180000;
+            // Auto-destrucción
             setTimeout(() => {
-                messageWrapper.classList.add('fading-out');
-                setTimeout(() => {
-                    messageWrapper.remove();
-                }, 500);
-            }, disappearTime - 500);
-
-            setTimeout(() => {
-                deleteMessage(docId);
-            }, disappearTime + 1000);
+                div.classList.add('fading-out');
+                setTimeout(() => div.remove(), 500);
+            }, 60000); // 1 minuto
+            setTimeout(() => deleteDoc(doc(db, `artifacts/${appId}/public/data/messages`, docId)), 61000);
         }
 
-        window.addEventListener('keyup', (e) => {
-            const isPrintScreen = e.key === 'PrintScreen' || (e.key === 'p' && e.ctrlKey);
-            const isCmdShift3 = e.metaKey && e.shiftKey && e.key === '3';
-            const isCmdShift4 = e.metaKey && e.shiftKey && e.key === '4';
-            const isWindowsSnippingTool = e.metaKey && e.shiftKey && e.key === 's';
+        // --- Eventos de Interfaz y Modo Paranoico ---
+        DOM.userId.onclick = () => {
+            navigator.clipboard.writeText(currentUserId);
+            showToast('ID Copiado');
+        };
 
-            if (isPrintScreen || isCmdShift3 || isCmdShift4 || isWindowsSnippingTool) {
-                const messages = messagesContainer.querySelectorAll('.message-bubble');
-                messages.forEach(message => {
-                    message.classList.add('fading-out');
-                    setTimeout(() => { message.remove(); }, 500);
-                });
-                showToast("¡Alerta! Mensajes borrados por intento de captura.", true);
-            }
+        DOM.recipient.addEventListener('keyup', (e) => {
+            clearTimeout(debounceTimer);
+            const val = e.target.value.trim();
+            if(!val) return DOM.presenceContainer.classList.add('hidden');
+            debounceTimer = setTimeout(() => checkRecipient(val), 800);
         });
+
+        // Anti-Capturas y Modo Paranoico (blur = oculta pantalla)
+        window.addEventListener('blur', () => DOM.shield.classList.add('active'));
+        window.addEventListener('focus', () => DOM.shield.classList.remove('active'));
         
-        // Nuevo: Evento para verificar el estado del receptor
-        recipientIdInput.addEventListener('keyup', (e) => {
-            if (e.target.value.trim() === '') {
-                clearChatHistory();
-                clearPresenceIndicator();
-            } else {
-                debouncedCheckRecipientStatus(e.target.value.trim());
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p')) {
+                DOM.messages.innerHTML = '';
+                showToast("Protocolo de Purga Activado");
             }
         });
 
-        clearRecipientBtn.addEventListener('click', () => {
-            recipientIdInput.value = '';
-            clearChatHistory();
-            clearPresenceIndicator();
-        });
-
-        sendMessageForm.addEventListener('submit', handleSendMessage);
         window.onload = initialize;
     </script>
 </body>
